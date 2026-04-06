@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Trending — marketing skills plugins agents (weekly)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #f97316;
+    --accent-glow: rgba(249,115,22,0.15);
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --red: #f85149;
+    --yellow: #d29922;
+    --gold: #f0c000;
+    --bar-bg: #21262d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a1030 0%, #0d1117 40%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.3rem;
+  }
+  .hero .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .hero .meta-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .meta-pill .val { color: var(--text); font-weight: 600; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  /* Score bars */
+  .score-section { margin-bottom: 3rem; }
+  .score-section h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .score-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .score-bar-row:hover { transform: translateX(4px); }
+  .score-bar-row:hover .bar-fill { filter: brightness(1.2); }
+
+  .rank-num {
+    width: 28px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .rank-num.top1 { color: var(--gold); }
+  .rank-num.top2 { color: #c0c0c0; }
+  .rank-num.top3 { color: #cd7f32; }
+
+  .bar-label {
+    width: 280px;
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-label a { color: var(--text); text-decoration: none; }
+  .bar-label a:hover { color: var(--accent); }
+  .bar-label .trending-badge {
+    display: inline-block;
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 26px;
+    background: var(--bar-bg);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bar-fill.tier1 { background: linear-gradient(90deg, #f97316, #fb923c); }
+  .bar-fill.tier2 { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .bar-fill.tier3 { background: linear-gradient(90deg, #6366f1, #818cf8); }
+  .bar-fill.tier4 { background: linear-gradient(90deg, #475569, #64748b); }
+
+  .bar-score {
+    width: 50px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* Cards */
+  .cards-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.3rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .card.on-trending { border-color: rgba(249,115,22,0.3); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.7rem;
+  }
+  .card-rank {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--bg);
+    background: var(--accent);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-score { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+  .card-name { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .card-name a { color: var(--blue); text-decoration: none; }
+  .card-name a:hover { text-decoration: underline; }
+
+  .card-desc {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+  .stat { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; }
+  .stat .icon { font-size: 0.9rem; }
+  .stat .value { font-weight: 600; }
+  .stat.stars .value { color: var(--gold); }
+  .stat.gained .value { color: var(--green); }
+  .stat.contributors .value { color: var(--purple); }
+  .stat.commits .value { color: var(--blue); }
+
+  .card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .tag {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .card-velocity {
+    position: absolute;
+    top: 1.3rem;
+    right: 4rem;
+    font-size: 0.7rem;
+    color: var(--green);
+    font-weight: 600;
+  }
+  .card-lang {
+    position: absolute;
+    bottom: 1.3rem;
+    right: 1.3rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .lang-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .lang-dot.js { background: #f1e05a; }
+  .lang-dot.py { background: #3572A5; }
+  .lang-dot.ts { background: #3178c6; }
+  .lang-dot.go { background: #00ADD8; }
+  .lang-dot.rust { background: #dea584; }
+  .lang-dot.shell { background: #89e051; }
+  .lang-dot.other { background: #64748b; }
+
+  /* Methodology */
+  .method-section {
+    margin-top: 3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .method-section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+  .formula {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .formula .w { color: var(--accent); font-weight: 600; }
+  .formula .comment { color: var(--text-muted); }
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.8rem;
+  }
+  .method-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .method-item .mi-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+
+  .footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .footer a { color: var(--blue); text-decoration: none; }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  @media (max-width: 700px) {
+    .bar-label { width: 140px; font-size: 0.75rem; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.5rem; }
+    .meta-row { gap: 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>&#x1F525; GitHub Trending Report</h1>
+    <div class="subtitle">marketing skills plugins agents — Weekly Momentum Rankings</div>
+    <div class="meta-row">
+      <span class="meta-pill">&#x1F50D; Search <span class="val">marketing skills plugins agents</span></span>
+      <span class="meta-pill">&#x1F4C5; Period <span class="val">Weekly</span> (Mar 30 – Apr 6, 2026)</span>
+      <span class="meta-pill">&#x1F4CA; Repos scored <span class="val">15</span></span>
+      <span class="meta-pill">&#x26A1; Source <span class="val">GitHub API</span></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Score Bars — injected by generate script -->
+  <div class="score-section">
+    <h2>&#x1F3C6; Momentum Rankings</h2>
+    <div class="score-bar-row" onclick="scrollToCard(1)">
+  <span class="rank-num top1">1</span>
+  <span class="bar-label"><a href="https://github.com/degausai/wonda" target="_blank">wonda</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier1" style="width:61.4%"></div>
+  </div>
+  <span class="bar-score">61.4</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(2)">
+  <span class="rank-num top2">2</span>
+  <span class="bar-label"><a href="https://github.com/eracle/OpenOutreach" target="_blank">OpenOutreach</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier1" style="width:51.8%"></div>
+  </div>
+  <span class="bar-score">51.8</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(3)">
+  <span class="rank-num top3">3</span>
+  <span class="bar-label"><a href="https://github.com/tarkaai/gtm-skills" target="_blank">gtm-skills</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier2" style="width:29%"></div>
+  </div>
+  <span class="bar-score">29</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(4)">
+  <span class="rank-num">4</span>
+  <span class="bar-label"><a href="https://github.com/pawbytes/skill-suites" target="_blank">skill-suites</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier2" style="width:24.9%"></div>
+  </div>
+  <span class="bar-score">24.9</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(5)">
+  <span class="rank-num">5</span>
+  <span class="bar-label"><a href="https://github.com/thearnavrustagi/marketmenow" target="_blank">marketmenow</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier3" style="width:19.6%"></div>
+  </div>
+  <span class="bar-score">19.6</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(6)">
+  <span class="rank-num">6</span>
+  <span class="bar-label"><a href="https://github.com/nexscope-ai/eCommerce-Skills" target="_blank">eCommerce-Skills</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier3" style="width:12.5%"></div>
+  </div>
+  <span class="bar-score">12.5</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(7)">
+  <span class="rank-num">7</span>
+  <span class="bar-label"><a href="https://github.com/OpenVoiceX/Voice-Marketing-Agent" target="_blank">Voice-Marketing-Agent</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier3" style="width:10.7%"></div>
+  </div>
+  <span class="bar-score">10.7</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(8)">
+  <span class="rank-num">8</span>
+  <span class="bar-label"><a href="https://github.com/Buildsoftwaresphere/Window" target="_blank">Window</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:6.4%"></div>
+  </div>
+  <span class="bar-score">6.4</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(9)">
+  <span class="rank-num">9</span>
+  <span class="bar-label"><a href="https://github.com/cameronking4/ReplyGuy-clone" target="_blank">ReplyGuy-clone</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:2.1%"></div>
+  </div>
+  <span class="bar-score">2.1</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(10)">
+  <span class="rank-num">10</span>
+  <span class="bar-label"><a href="https://github.com/aitytech/agentkits-marketing" target="_blank">agentkits-marketing</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(11)">
+  <span class="rank-num">11</span>
+  <span class="bar-label"><a href="https://github.com/wanikua/become-ceo" target="_blank">become-ceo</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(12)">
+  <span class="rank-num">12</span>
+  <span class="bar-label"><a href="https://github.com/praj2408/Smart-Marketing-Assistant-Crew-AI" target="_blank">Smart-Marketing-Assistant-Crew-AI</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(13)">
+  <span class="rank-num">13</span>
+  <span class="bar-label"><a href="https://github.com/talknerdytome-labs/claude-agents" target="_blank">claude-agents</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(14)">
+  <span class="rank-num">14</span>
+  <span class="bar-label"><a href="https://github.com/434media/bizdev-agent" target="_blank">bizdev-agent</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+<div class="score-bar-row" onclick="scrollToCard(15)">
+  <span class="rank-num">15</span>
+  <span class="bar-label"><a href="https://github.com/othmansamih/AI-Marketing-Team-Automation" target="_blank">AI-Marketing-Team-Automation</a></span>
+  <div class="bar-track">
+    <div class="bar-fill tier4" style="width:0%"></div>
+  </div>
+  <span class="bar-score">0</span>
+</div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,#f97316,#fb923c)"></span> Tier 1 (50+)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,#3b82f6,#60a5fa)"></span> Tier 2 (20–49)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,#6366f1,#818cf8)"></span> Tier 3 (10–19)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,#475569,#64748b)"></span> Tier 4 (&lt;10)</div>
+      <div class="legend-item">~ = stars estimated</div>
+    </div>
+  </div>
+
+  <!-- Detail Cards — injected by generate script -->
+  <div class="cards-section">
+    <h2>&#x1F4CB; Detailed Analysis</h2>
+    <div class="cards-grid">
+      <div class="card" id="card-1">
+  <div class="card-header">
+    <span class="card-rank">#1</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/degausai/wonda" target="_blank">degausai/wonda</a></div>
+      <div class="card-desc">AI marketing agent platform for automated campaign creation, analytics, and content optimization</div>
+    </div>
+    <div class="card-score" style="color:#f97316">61.4</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">15</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+65~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">3</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">25</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#89e051"></span>Shell</span><span class="tag">agent</span><span class="tag">agent-skills</span><span class="tag">ai</span><span class="tag">automation</span><span class="tag">claude-code</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 433.33% velocity</span></div>
+</div>
+<div class="card" id="card-2">
+  <div class="card-header">
+    <span class="card-rank">#2</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/eracle/OpenOutreach" target="_blank">eracle/OpenOutreach</a></div>
+      <div class="card-desc">Open-source outreach automation tool for cold email, LinkedIn, and multi-channel marketing campaigns</div>
+    </div>
+    <div class="card-score" style="color:#f97316">51.8</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">1.4K</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+83~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">1</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">39</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag">agent</span><span class="tag">agentic</span><span class="tag">automated-outreach</span><span class="tag">automation</span><span class="tag">bot</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 6% velocity</span></div>
+</div>
+<div class="card" id="card-3">
+  <div class="card-header">
+    <span class="card-rank">#3</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/tarkaai/gtm-skills" target="_blank">tarkaai/gtm-skills</a></div>
+      <div class="card-desc">Go-to-market skills and playbooks for AI-assisted sales, marketing, and launch strategies</div>
+    </div>
+    <div class="card-score" style="color:#3b82f6">29</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">8</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+8</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">1</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">100</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 100% velocity</span></div>
+</div>
+<div class="card" id="card-4">
+  <div class="card-header">
+    <span class="card-rank">#4</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/pawbytes/skill-suites" target="_blank">pawbytes/skill-suites</a></div>
+      <div class="card-desc">Bundled skill suites for marketing, SEO, social media, and content creation workflows</div>
+    </div>
+    <div class="card-score" style="color:#3b82f6">24.9</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">16</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+16</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">1</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">28</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 100% velocity</span></div>
+</div>
+<div class="card" id="card-5">
+  <div class="card-header">
+    <span class="card-rank">#5</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/thearnavrustagi/marketmenow" target="_blank">thearnavrustagi/marketmenow</a></div>
+      <div class="card-desc">AI-powered marketing assistant that generates copy, social posts, and campaign strategies on demand</div>
+    </div>
+    <div class="card-score" style="color:#6366f1">19.6</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">94</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+29~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">1</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">12</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag">ai</span><span class="tag">marketing</span><span class="tag">openclaw</span><span class="tag">openclaw-skills</span><span class="tag">playwright</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 30.85% velocity</span></div>
+</div>
+<div class="card" id="card-6">
+  <div class="card-header">
+    <span class="card-rank">#6</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/nexscope-ai/eCommerce-Skills" target="_blank">nexscope-ai/eCommerce-Skills</a></div>
+      <div class="card-desc">E-commerce focused AI skills for product marketing, listing optimization, and conversion copywriting</div>
+    </div>
+    <div class="card-score" style="color:#6366f1">12.5</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">78</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+9~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">1</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">2</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag">agent-skills</span><span class="tag">ai</span><span class="tag">ai-agent-skills</span><span class="tag">ai-agents</span><span class="tag">amazon-seller-tools</span><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">⚡ 11.54% velocity</span></div>
+</div>
+<div class="card" id="card-7">
+  <div class="card-header">
+    <span class="card-rank">#7</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/OpenVoiceX/Voice-Marketing-Agent" target="_blank">OpenVoiceX/Voice-Marketing-Agent</a></div>
+      <div class="card-desc">Voice-based AI marketing agent for phone outreach, call campaigns, and conversational sales</div>
+    </div>
+    <div class="card-score" style="color:#6366f1">10.7</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">18</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span></div>
+</div>
+<div class="card" id="card-8">
+  <div class="card-header">
+    <span class="card-rank">#8</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/Buildsoftwaresphere/Window" target="_blank">Buildsoftwaresphere/Window</a></div>
+      <div class="card-desc">Marketing analytics dashboard with AI-driven insights and campaign performance tracking</div>
+    </div>
+    <div class="card-score" style="color:#475569">6.4</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">16</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"></div>
+</div>
+<div class="card" id="card-9">
+  <div class="card-header">
+    <span class="card-rank">#9</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/cameronking4/ReplyGuy-clone" target="_blank">cameronking4/ReplyGuy-clone</a></div>
+      <div class="card-desc">Social media engagement bot that auto-replies to relevant posts for organic marketing reach</div>
+    </div>
+    <div class="card-score" style="color:#475569">2.1</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">101</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3178c6"></span>TypeScript</span><span class="tag">ai</span><span class="tag">automation</span><span class="tag">linkedin</span><span class="tag">marketing</span><span class="tag">nlp</span></div>
+</div>
+<div class="card" id="card-10">
+  <div class="card-header">
+    <span class="card-rank">#10</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/aitytech/agentkits-marketing" target="_blank">aitytech/agentkits-marketing</a></div>
+      <div class="card-desc">Plug-and-play marketing agent kits for email, SEO, and ad campaign automation</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">426</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span></div>
+</div>
+<div class="card" id="card-11">
+  <div class="card-header">
+    <span class="card-rank">#11</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/wanikua/become-ceo" target="_blank">wanikua/become-ceo</a></div>
+      <div class="card-desc">Business simulation and marketing strategy game with AI-powered market analysis</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">54</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3178c6"></span>TypeScript</span><span class="tag">ai</span><span class="tag">ai-agents</span><span class="tag">ai-team</span><span class="tag">automation</span><span class="tag">browser-automation</span></div>
+</div>
+<div class="card" id="card-12">
+  <div class="card-header">
+    <span class="card-rank">#12</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/praj2408/Smart-Marketing-Assistant-Crew-AI" target="_blank">praj2408/Smart-Marketing-Assistant-Crew-AI</a></div>
+      <div class="card-desc">CrewAI-based multi-agent system for market research, content writing, and campaign planning</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">32</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span><span class="tag">agents</span><span class="tag">assistant</span><span class="tag">automation</span><span class="tag">crewai</span><span class="tag">generative-ai</span></div>
+</div>
+<div class="card" id="card-13">
+  <div class="card-header">
+    <span class="card-rank">#13</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/talknerdytome-labs/claude-agents" target="_blank">talknerdytome-labs/claude-agents</a></div>
+      <div class="card-desc">Claude-powered agent templates for marketing automation and content generation</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">11</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag">agents</span><span class="tag">ai</span><span class="tag">ai-agents</span><span class="tag">anthropic</span><span class="tag">automation</span></div>
+</div>
+<div class="card" id="card-14">
+  <div class="card-header">
+    <span class="card-rank">#14</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/434media/bizdev-agent" target="_blank">434media/bizdev-agent</a></div>
+      <div class="card-desc">Business development AI agent for lead generation, outreach, and partnership marketing</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">8</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#f1e05a"></span>JavaScript</span></div>
+</div>
+<div class="card" id="card-15">
+  <div class="card-header">
+    <span class="card-rank">#15</span>
+    <div style="flex:1;margin:0 0.8rem">
+      <div class="card-name"><a href="https://github.com/othmansamih/AI-Marketing-Team-Automation" target="_blank">othmansamih/AI-Marketing-Team-Automation</a></div>
+      <div class="card-desc">Multi-agent marketing team simulation automating SEO, social, email, and ad campaigns</div>
+    </div>
+    <div class="card-score" style="color:#475569">0</div>
+  </div>
+  <div class="card-stats">
+    <div class="stat stars"><span class="icon">⭐</span> <span class="value">7</span></div>
+    <div class="stat gained"><span class="icon">📈</span> <span class="value">+0~</span></div>
+    <div class="stat contributors"><span class="icon">👥</span> <span class="value">0</span></div>
+    <div class="stat commits"><span class="icon">💻</span> <span class="value">0</span></div>
+  </div>
+  <div class="card-tags"><span class="tag"><span class="lang-dot" style="background:#3572a5"></span>Python</span></div>
+</div>
+
+    </div>
+  </div>
+
+  <!-- Methodology (static) -->
+  <div class="method-section">
+    <h2>&#x2699;&#xFE0F; Scoring Methodology</h2>
+    <div class="formula">
+<span class="comment">// Standard scoring (stargazer data available)</span>
+score = (
+    stars_gained  <span class="w">&times; 0.40</span>  +  <span class="comment">// Stars gained in period</span>
+    contributors  <span class="w">&times; 0.20</span>  +  <span class="comment">// Unique contributors</span>
+    commits       <span class="w">&times; 0.15</span>  +  <span class="comment">// Commits in period</span>
+    issues        <span class="w">&times; 0.10</span>  +  <span class="comment">// Open issues</span>
+    velocity      <span class="w">&times; 0.15</span>     <span class="comment">// stars_gained / total_stars</span>
+) &times; 100  +  <span class="w">trending_bonus</span>  <span class="comment">// +10 if on github.com/trending</span>
+    </div>
+    <div class="method-grid">
+      <div class="method-item"><span class="mi-icon">&#x2B50;</span> <span><strong>velocity_ratio</strong> — a repo going 10&rarr;60 (ratio 0.83) outranks 5K&rarr;5.2K (ratio 0.04)</span></div>
+      <div class="method-item"><span class="mi-icon">&#x1F504;</span> <span><strong>Fallback</strong> — repos &gt;10K stars use commit + contributor proxy instead of stargazer API</span></div>
+      <div class="method-item"><span class="mi-icon">&#x1F310;</span> <span><strong>Data source</strong> — GitHub REST API (unauthenticated, 60 req/hr)</span></div>
+      <div class="method-item"><span class="mi-icon">&#x1F4C8;</span> <span><strong>Normalization</strong> — each metric divided by max across all candidates (0&ndash;1 scale)</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by <strong>github-trending</strong> skill &middot; <a href="https://claude.ai">Claude Code</a> &middot; April 6, 2026
+  </div>
+
+</div>
+
+<script>
+function scrollToCard(n) {
+  const el = document.getElementById('card-' + n);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bar-fill').forEach(f => {
+    const w = f.style.width;
+    f.style.width = '0%';
+    requestAnimationFrame(() => { requestAnimationFrame(() => { f.style.width = w; }); });
+  });
+});
+</script>
+
+</body>
+</html>
